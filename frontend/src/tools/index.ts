@@ -41,6 +41,7 @@ export const toolComponents: Record<string, React.LazyExoticComponent<React.Comp
   'params-serialization': lazy(() => import('./dev/ParamsSerialization')),
   'cidr-calculator': lazy(() => import('./dev/CIDRCalculator')),
   'regex-tester': lazy(() => import('./dev/RegexTester')),
+  'ua-parser': lazy(() => import('./dev/UAParser')),
 };
 
 // 内置工具列表
@@ -84,4 +85,5 @@ export const builtInTools = [
   { slug: 'params-serialization', name: 'URL 参数序列化', category: 'dev', icon: '🔗', description: 'URL 参数与 JSON 互转' },
   { slug: 'cidr-calculator', name: 'CIDR 计算器', category: 'dev', icon: '🌐', description: '计算网络地址、子网掩码等' },
   { slug: 'regex-tester', name: '正则测试', category: 'dev', icon: '📝', description: '正则表达式在线测试' },
+  { slug: 'ua-parser', name: 'UA 解析器', category: 'dev', icon: '🔍', description: '解析 User-Agent 获取设备信息' },
 ];
