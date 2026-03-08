@@ -71,7 +71,7 @@ export default function Layout() {
         </main>
 
         <footer className="py-6 text-center text-sm text-slate-500 border-t border-slate-200 bg-white">
-          <p>© 2024 Alchemist - 炼金术师. All rights reserved.</p>
+          <p>© 2026 Alchemist - 炼金术师. All rights reserved.</p>
         </footer>
       </div>
     </div>
