@@ -1,39 +1,78 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Copy, Check, Trash2, CheckCircle, XCircle } from 'lucide-react';
 
 export default function RegexTester() {
   const [pattern, setPattern] = useState('');
   const [flags, setFlags] = useState('g');
   const [testString, setTestString] = useState('');
-  const [result, setResult] = useState<{
-    matches: RegExpMatchArray | null;
-    error: string | null;
-    isGlobal: boolean;
-  } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const test = () => {
-    if (!pattern) {
-      setResult(null);
-      return;
-    }
+  // 安全计算匹配结果
+  const result = useMemo(() => {
+    if (!pattern) return null;
 
     try {
       const regex = new RegExp(pattern, flags);
       const matches = testString.match(regex);
-      setResult({
+      return {
         matches,
         error: null,
         isGlobal: flags.includes('g'),
-      });
+      };
     } catch (e) {
-      setResult({
+      return {
         matches: null,
         error: (e as Error).message,
         isGlobal: false,
-      });
+      };
     }
-  };
+  }, [pattern, flags, testString]);
+
+  // 安全分割文本并高亮匹配部分
+  const highlightedParts = useMemo(() => {
+    if (!pattern || !testString || result?.error) {
+      return [{ text: testString, isMatch: false }];
+    }
+
+    try {
+      const parts: { text: string; isMatch: boolean }[] = [];
+      let lastIndex = 0;
+
+      // 使用 exec 迭代所有匹配
+      let match;
+      const regexForExec = new RegExp(pattern, flags);
+      while ((match = regexForExec.exec(testString)) !== null) {
+        // 添加匹配前的文本
+        if (match.index > lastIndex) {
+          parts.push({
+            text: testString.slice(lastIndex, match.index),
+            isMatch: false,
+          });
+        }
+        // 添加匹配的文本
+        parts.push({
+          text: match[0],
+          isMatch: true,
+        });
+        lastIndex = match.index + match[0].length;
+
+        // 非全局模式只匹配一次
+        if (!flags.includes('g')) break;
+      }
+
+      // 添加剩余文本
+      if (lastIndex < testString.length) {
+        parts.push({
+          text: testString.slice(lastIndex),
+          isMatch: false,
+        });
+      }
+
+      return parts;
+    } catch {
+      return [{ text: testString, isMatch: false }];
+    }
+  }, [pattern, flags, testString, result]);
 
   const handleCopy = async () => {
     if (!result?.matches) return;
@@ -45,18 +84,6 @@ export default function RegexTester() {
   const handleClear = () => {
     setPattern('');
     setTestString('');
-    setResult(null);
-  };
-
-  const highlightMatches = () => {
-    if (!pattern || !testString || result?.error) return testString;
-
-    try {
-      const regex = new RegExp(pattern, flags);
-      return testString.replace(regex, (match) => `<mark class="bg-yellow-200">${match}</mark>`);
-    } catch {
-      return testString;
-    }
   };
 
   const flagOptions = [
@@ -158,10 +185,17 @@ export default function RegexTester() {
 
               <div className="bg-slate-50 rounded-xl p-4">
                 <div className="text-sm font-medium text-slate-600 mb-2">高亮显示</div>
-                <div
-                  className="font-mono text-sm break-all"
-                  dangerouslySetInnerHTML={{ __html: highlightMatches() }}
-                />
+                <div className="font-mono text-sm break-all whitespace-pre-wrap">
+                  {highlightedParts.map((part, i) =>
+                    part.isMatch ? (
+                      <mark key={i} className="bg-yellow-200 px-0.5 rounded">
+                        {part.text}
+                      </mark>
+                    ) : (
+                      <span key={i}>{part.text}</span>
+                    )
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -169,13 +203,6 @@ export default function RegexTester() {
       )}
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={test}
-          disabled={!pattern}
-          className="flex-1 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:bg-slate-300 text-white rounded-lg transition-colors font-medium"
-        >
-          测试
-        </button>
         <button
           onClick={handleCopy}
           disabled={!result?.matches}

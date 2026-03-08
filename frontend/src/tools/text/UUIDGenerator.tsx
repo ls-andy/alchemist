@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Copy, Check, Trash2, RefreshCw } from 'lucide-react';
+import { v1 as uuidv1, v4 as uuidv4 } from 'uuid';
 
 export default function UUIDGenerator() {
   const [uuids, setUuids] = useState<string[]>([]);
@@ -9,42 +10,19 @@ export default function UUIDGenerator() {
   const [hyphens, setHyphens] = useState(true);
   const [copied, setCopied] = useState<number | null>(null);
 
-  const generateUUIDv4 = () => {
-    // Use crypto API for better randomness
-    const array = new Uint8Array(16);
-    crypto.getRandomValues(array);
-
-    // Set version (4) and variant bits
-    array[6] = (array[6] & 0x0f) | 0x40;
-    array[8] = (array[8] & 0x3f) | 0x80;
-
-    const hex = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
-    return hex;
-  };
-
-  const generateUUIDv1 = () => {
-    // Simplified v1 - timestamp based
-    const now = Date.now();
-    const timestamp = now.toString(16).padStart(12, '0');
-    const random = crypto.getRandomValues(new Uint8Array(8));
-    const hex = timestamp + Array.from(random, b => b.toString(16).padStart(2, '0')).join('');
-    return hex;
-  };
-
-  const formatUUID = (hex: string) => {
-    let uuid = hex;
+  const generateUUID = () => {
+    let uuid = version === 'v4' ? uuidv4() : uuidv1();
+    
     if (uppercase) uuid = uuid.toUpperCase();
-    if (hyphens) {
-      uuid = `${uuid.slice(0, 8)}-${uuid.slice(8, 12)}-${uuid.slice(12, 16)}-${uuid.slice(16, 20)}-${uuid.slice(20)}`;
-    }
+    if (!hyphens) uuid = uuid.replace(/-/g, '');
+    
     return uuid;
   };
 
   const generate = () => {
     const newUuids: string[] = [];
     for (let i = 0; i < count; i++) {
-      const hex = version === 'v4' ? generateUUIDv4() : generateUUIDv1();
-      newUuids.push(formatUUID(hex));
+      newUuids.push(generateUUID());
     }
     setUuids(newUuids);
   };
