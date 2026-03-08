@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_AD_SLOT_HEADER: string
   readonly VITE_AD_SLOT_SIDEBAR: string
   readonly VITE_AD_SLOT_TOOL_BELOW: string
+  readonly VITE_AFDIAN_URL: string
 }
 
 interface ImportMeta {

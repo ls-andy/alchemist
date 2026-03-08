@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { builtInTools } from '../tools';
@@ -71,7 +72,16 @@ export default function Layout() {
         </main>
 
         <footer className="py-6 text-center text-sm text-slate-500 border-t border-slate-200 bg-white">
-          <p>© 2026 Alchemist - 炼金术师. All rights reserved.</p>
+          <p className="mb-2">© 2026 Alchemist - 炼金术师. All rights reserved.</p>
+          <a
+            href={import.meta.env.VITE_AFDIAN_URL || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-primary-500 hover:text-primary-600 transition-colors"
+          >
+            <Heart size={14} className="text-pink-500" />
+            <span>支持项目</span>
+          </a>
         </footer>
       </div>
     </div>
