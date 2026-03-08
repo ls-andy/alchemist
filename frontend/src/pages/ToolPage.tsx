@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Suspense } from 'react';
 import { toolComponents } from '../tools';
+import AdUnit, { AD_SLOTS } from '../components/AdUnit';
 
 export default function ToolPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -46,6 +47,15 @@ export default function ToolPage() {
         >
           <ToolComponent />
         </Suspense>
+      </div>
+
+      {/* 工具下方广告位 */}
+      <div className="mt-6">
+        <AdUnit 
+          slot={import.meta.env.VITE_AD_SLOT_TOOL_BELOW || AD_SLOTS.TOOL_BELOW_BANNER} 
+          format="horizontal" 
+          className="w-full"
+        />
       </div>
     </div>
   );

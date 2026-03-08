@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { X, Home, Settings, Sparkles, TrendingUp, Clock } from 'lucide-react';
 import { Category } from '../types';
 import clsx from 'clsx';
+import AdUnit, { AD_SLOTS } from './AdUnit';
 
 interface SidebarProps {
   categories: Category[];
@@ -94,6 +95,15 @@ export default function Sidebar({ categories, isOpen, onClose }: SidebarProps) {
                 </Link>
               ))}
             </nav>
+          </div>
+
+          {/* 广告位 - 侧边栏底部 */}
+          <div className="px-4 py-2">
+            <AdUnit 
+              slot={import.meta.env.VITE_AD_SLOT_SIDEBAR || AD_SLOTS.SIDEBAR_RECTANGLE} 
+              format="rectangle" 
+              className="w-full"
+            />
           </div>
 
           {/* 底部管理入口 */}
