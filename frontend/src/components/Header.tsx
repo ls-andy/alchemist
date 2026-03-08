@@ -32,7 +32,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
       <div className="flex items-center h-16 px-4 md:px-6 gap-4">
         {/* 移动端菜单按钮 */}
         <button 

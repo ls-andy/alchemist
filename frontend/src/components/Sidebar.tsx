@@ -21,13 +21,13 @@ export default function Sidebar({ categories, isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* 移动端侧边栏 */}
+      {/* 侧边栏 */}
       <aside className={clsx(
-        'sidebar fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300',
+        'fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300',
         // 移动端：根据 isOpen 控制显示/隐藏
         isOpen ? 'translate-x-0' : '-translate-x-full',
-        // 桌面端：始终显示，无阴影
-        'md:translate-x-0 md:shadow-none'
+        // 桌面端：始终显示
+        'md:translate-x-0 md:shadow-none md:block'
       )}>
         <div className="flex flex-col h-full">
           {/* Logo */}
