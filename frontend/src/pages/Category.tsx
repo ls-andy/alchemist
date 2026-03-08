@@ -1,13 +1,41 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { toolsApi } from '../api';
+import { builtInTools } from '../tools';
 import { Tool } from '../types';
 import ToolCard from '../components/ToolCard';
+
+const categoryNames: Record<string, string> = {
+  encoding: '编码解码',
+  crypto: '加密哈希',
+  datetime: '时间日期',
+  generate: '生成工具',
+  text: '文字处理',
+  math: '数学工具',
+  dev: '开发工具',
+};
+
+const staticTools: Tool[] = builtInTools.map((tool, index) => ({
+  id: index + 1,
+  slug: tool.slug,
+  name: tool.name,
+  category_id: null,
+  category_name: categoryNames[tool.category] || tool.category,
+  category_slug: tool.category,
+  icon: tool.icon,
+  description: tool.description,
+  url: null,
+  tool_type: 'builtin' as const,
+  tags: [],
+  is_featured: false,
+  is_active: true,
+  view_count: Math.floor(Math.random() * 1000) + 100,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+}));
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const [tools, setTools] = useState<Tool[]>([]);
-  const [categoryName, setCategoryName] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,21 +44,14 @@ export default function Category() {
     }
   }, [slug]);
 
-  const loadTools = async (categorySlug: string) => {
+  const loadTools = (categorySlug: string) => {
     setLoading(true);
-    try {
-      const res = await toolsApi.getAll({ category: categorySlug, limit: 50 }) as any;
-      if (res.success) {
-        setTools(res.data);
-        if (res.data.length > 0) {
-          setCategoryName(res.data[0].category_name || categorySlug);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load tools:', error);
-    } finally {
+    
+    setTimeout(() => {
+      const filtered = staticTools.filter(tool => tool.category_slug === categorySlug);
+      setTools(filtered);
       setLoading(false);
-    }
+    }, 100);
   };
 
   return (
@@ -38,7 +59,7 @@ export default function Category() {
       {/* 页面标题 */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">
-          {categoryName || '分类工具'}
+          {categoryNames[slug || ''] || slug || '分类工具'}
         </h1>
         <p className="mt-1 text-slate-500">
           共 {tools.length} 个工具

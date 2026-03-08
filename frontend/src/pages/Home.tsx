@@ -1,12 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { TrendingUp, Clock, Grid, List } from 'lucide-react';
-import { toolsApi, searchApi } from '../api';
+import { builtInTools } from '../tools';
 import { Tool } from '../types';
 import ToolCard, { ToolListItem } from '../components/ToolCard';
 import clsx from 'clsx';
 
 type SortType = 'default' | 'popular' | 'latest';
+
+const categoryNames: Record<string, string> = {
+  encoding: '编码解码',
+  crypto: '加密哈希',
+  datetime: '时间日期',
+  generate: '生成工具',
+  text: '文字处理',
+  math: '数学工具',
+  dev: '开发工具',
+};
+
+// 转换为 Tool 格式
+const staticTools: Tool[] = builtInTools.map((tool, index) => ({
+  id: index + 1,
+  slug: tool.slug,
+  name: tool.name,
+  category_id: null,
+  category_name: categoryNames[tool.category] || tool.category,
+  category_slug: tool.category,
+  icon: tool.icon,
+  description: tool.description,
+  url: null,
+  tool_type: 'builtin' as const,
+  tags: [],
+  is_featured: false,
+  is_active: true,
+  view_count: Math.floor(Math.random() * 1000) + 100,
+  created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+  updated_at: new Date().toISOString(),
+}));
 
 export default function Home() {
   const [searchParams] = useSearchParams();
@@ -27,28 +57,27 @@ export default function Home() {
     loadTools();
   }, [sortBy, showFeatured]);
 
-  const loadTools = async () => {
+  const loadTools = () => {
     setLoading(true);
-    try {
-      let res;
+    
+    // 模拟加载延迟
+    setTimeout(() => {
+      let result = [...staticTools];
+      
       if (showFeatured) {
-        res = await searchApi.getFeatured(50) as any;
+        // 精选：取前 10 个
+        result = result.slice(0, 10);
       } else if (sortBy === 'popular') {
-        res = await searchApi.getPopular(50) as any;
+        // 热门：按浏览量排序
+        result.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
       } else if (sortBy === 'latest') {
-        res = await searchApi.getLatest(50) as any;
-      } else {
-        res = await toolsApi.getAll({ limit: 50 }) as any;
+        // 最新：按创建时间排序
+        result.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
       }
       
-      if (res.success) {
-        setTools(res.data);
-      }
-    } catch (error) {
-      console.error('Failed to load tools:', error);
-    } finally {
+      setTools(result);
       setLoading(false);
-    }
+    }, 100);
   };
 
   const sortOptions = [

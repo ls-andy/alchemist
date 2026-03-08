@@ -1,9 +1,38 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search as SearchIcon } from 'lucide-react';
-import { searchApi } from '../api';
+import { builtInTools } from '../tools';
 import { Tool } from '../types';
 import ToolCard from '../components/ToolCard';
+
+const categoryNames: Record<string, string> = {
+  encoding: '编码解码',
+  crypto: '加密哈希',
+  datetime: '时间日期',
+  generate: '生成工具',
+  text: '文字处理',
+  math: '数学工具',
+  dev: '开发工具',
+};
+
+const staticTools: Tool[] = builtInTools.map((tool, index) => ({
+  id: index + 1,
+  slug: tool.slug,
+  name: tool.name,
+  category_id: null,
+  category_name: categoryNames[tool.category] || tool.category,
+  category_slug: tool.category,
+  icon: tool.icon,
+  description: tool.description,
+  url: null,
+  tool_type: 'builtin' as const,
+  tags: [],
+  is_featured: false,
+  is_active: true,
+  view_count: Math.floor(Math.random() * 1000) + 100,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+}));
 
 export default function Search() {
   const [searchParams] = useSearchParams();
@@ -18,20 +47,22 @@ export default function Search() {
     }
   }, [query]);
 
-  const performSearch = async (q: string) => {
+  const performSearch = (q: string) => {
     setLoading(true);
     const startTime = Date.now();
-    try {
-      const res = await searchApi.search(q, 50) as any;
-      if (res.success) {
-        setTools(res.data);
-      }
-    } catch (error) {
-      console.error('Search failed:', error);
-    } finally {
+    
+    setTimeout(() => {
+      const lowerQ = q.toLowerCase();
+      const results = staticTools.filter(tool => 
+        tool.name.toLowerCase().includes(lowerQ) ||
+        (tool.description && tool.description.toLowerCase().includes(lowerQ)) ||
+        (tool.category_slug && tool.category_slug.toLowerCase().includes(lowerQ))
+      );
+      
+      setTools(results);
       setSearchTime(Date.now() - startTime);
       setLoading(false);
-    }
+    }, 50);
   };
 
   return (

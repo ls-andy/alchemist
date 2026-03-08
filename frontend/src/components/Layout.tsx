@@ -1,28 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { categoriesApi } from '../api';
+import { builtInTools } from '../tools';
 import { Category as CategoryType } from '../types';
+
+// 静态分类数据
+const categoryIcons: Record<string, string> = {
+  encoding: '🔢',
+  crypto: '🔐',
+  datetime: '⏰',
+  generate: '🎲',
+  text: '📝',
+  math: '🔢',
+  dev: '💻',
+};
+
+const categoryNames: Record<string, string> = {
+  encoding: '编码解码',
+  crypto: '加密哈希',
+  datetime: '时间日期',
+  generate: '生成工具',
+  text: '文字处理',
+  math: '数学工具',
+  dev: '开发工具',
+};
+
+// 从工具列表生成分类
+const staticCategories: CategoryType[] = Array.from(
+  new Set(builtInTools.map(t => t.category))
+).map((slug, index) => ({
+  id: index + 1,
+  name: categoryNames[slug] || slug,
+  slug,
+  icon: categoryIcons[slug] || '📦',
+  description: null,
+  sort_order: index,
+  tool_count: builtInTools.filter(t => t.category === slug).length,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+}));
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      const res = await categoriesApi.getAll() as any;
-      if (res.success) {
-        setCategories(res.data);
-      }
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-    }
-  };
+  const [categories] = useState<CategoryType[]>(staticCategories);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -50,7 +71,7 @@ export default function Layout() {
         </main>
 
         <footer className="py-6 text-center text-sm text-slate-500 border-t border-slate-200 bg-white">
-          <p>© 2024 Illuminati Tools Hub. All rights reserved.</p>
+          <p>© 2024 Alchemist - 炼金术师. All rights reserved.</p>
         </footer>
       </div>
     </div>
