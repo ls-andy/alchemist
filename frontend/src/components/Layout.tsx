@@ -47,20 +47,20 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* 移动端遮罩 */}
-      {sidebarOpen && (
-        <div 
-          className="overlay md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       {/* 侧边栏 */}
       <Sidebar 
         categories={categories} 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
       />
+
+      {/* 移动端遮罩 - 必须在侧边栏之后渲染，z-index 低于侧边栏 */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* 主内容区 */}
       <div className="md:pl-64 flex flex-col min-h-screen">
